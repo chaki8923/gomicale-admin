@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 市町村コレクション
+    match /municipalities/{municipality} {
+      // 誰でも読み取り可能
+      allow read: if true;
+      
+      // 開発・テスト用：誰でも書き込み可能
+      // TODO: 本番環境では認証を実装してください
+      allow write: if true;
+      
+      // 地域サブコレクション
+      match /areas/{area} {
+        allow read: if true;
+        allow write: if true;
+      }
+    }
+    
+    // ごみ分別品目コレクション
+    match /garbageItems/{item} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
+
