@@ -1,15 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, getDocs, addDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
-import { Upload, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import type { GarbageSchedule, MonthlySchedule, GarbageCategory } from '@/lib/gemini';
 
 interface Municipality {
   id: string;
-  name: string;
   prefecture: string;
 }
 
@@ -45,6 +44,8 @@ export default function DataMigrationPage() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [normalizeLoading, setNormalizeLoading] = useState(false);
+  const [normalizeStatus, setNormalizeStatus] = useState<string>('');
 
   useEffect(() => {
     fetchMunicipalities();
@@ -63,7 +64,7 @@ export default function DataMigrationPage() {
       }
     } catch (error) {
       console.error('Error fetching municipalities:', error);
-      setError('市町村データの取得に失敗しました');
+      setError('都道府県データの取得に失敗しました');
     }
   };
 
@@ -105,7 +106,7 @@ export default function DataMigrationPage() {
 
   const handleImport = async () => {
     if (!jsonData || !selectedMunicipalityId) {
-      setError('JSONファイルと市町村を選択してください');
+      setError('JSONファイルと都道府県を選択してください');
       return;
     }
 
@@ -114,10 +115,10 @@ export default function DataMigrationPage() {
     setError('');
 
     try {
-      // 市町村情報を取得
+      // 都道府県情報を取得
       const municipalityDoc = await getDoc(doc(db, 'municipalities', selectedMunicipalityId));
       if (!municipalityDoc.exists()) {
-        throw new Error('市町村が見つかりません');
+        throw new Error('都道府県が見つかりません');
       }
       const municipality = municipalityDoc.data();
 
@@ -153,7 +154,7 @@ export default function DataMigrationPage() {
         setStatus(`ごみ分別品目をインポート中... (${itemCount}/${jsonData.garbageItems.length})`);
       }
 
-      setStatus(`✓ インポート完了: ${municipality.prefecture}${municipality.name} - 地域${areaCount}件、品目${itemCount}件を登録しました`);
+      setStatus(`✓ インポート完了: ${municipality.prefecture} - 地域${areaCount}件、品目${itemCount}件を登録しました`);
       setJsonData(null);
       setJsonFile(null);
     } catch (err) {
@@ -161,6 +162,104 @@ export default function DataMigrationPage() {
       setError('インポートに失敗しました: ' + (err as Error).message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 既存のスケジュールデータを正規化（"2025-04" → "4" 形式に変換）
+  const normalizeScheduleData = (schedule: any): GarbageSchedule => {
+    const normalized: GarbageSchedule = {};
+    
+    for (const key in schedule) {
+      let month: string;
+      
+      // "2025-04" 形式の場合、月部分を抽出
+      if (key.includes('-')) {
+        const [_, monthPart] = key.split('-');
+        month = String(parseInt(monthPart, 10)); // "04" -> "4"
+      } else {
+        // すでに月番号形式の場合
+        month = String(parseInt(key, 10)); // "01" -> "1", "1" -> "1"
+      }
+      
+      normalized[month] = schedule[key];
+    }
+    
+    return normalized;
+  };
+
+  // すべての地域のスケジュールデータを正規化
+  const handleNormalizeAllData = async () => {
+    if (!selectedMunicipalityId) {
+      setError('都道府県を選択してください');
+      return;
+    }
+
+    const confirmed = confirm(
+      '選択した都道府県のすべての地域データを正規化します。\n' +
+      '（"2025-04"形式を"4"形式に変換します）\n\n' +
+      'この操作を実行しますか？'
+    );
+    
+    if (!confirmed) return;
+
+    setNormalizeLoading(true);
+    setNormalizeStatus('正規化処理中...');
+    setError('');
+
+    try {
+      // 都道府県情報を取得
+      const municipalityDoc = await getDoc(doc(db, 'municipalities', selectedMunicipalityId));
+      if (!municipalityDoc.exists()) {
+        throw new Error('都道府県が見つかりません');
+      }
+      const municipality = municipalityDoc.data();
+
+      // すべての地域を取得
+      const areasSnapshot = await getDocs(
+        collection(db, 'municipalities', selectedMunicipalityId, 'areas')
+      );
+
+      let normalizedCount = 0;
+      let skippedCount = 0;
+
+      for (const areaDoc of areasSnapshot.docs) {
+        const areaData = areaDoc.data();
+        const schedule = areaData.schedule;
+
+        if (!schedule || typeof schedule !== 'object') {
+          skippedCount++;
+          continue;
+        }
+
+        // スケジュールデータに "年-月" 形式のキーが含まれているかチェック
+        const needsNormalization = Object.keys(schedule).some(key => key.includes('-'));
+
+        if (needsNormalization) {
+          // 正規化を実行
+          const normalizedSchedule = normalizeScheduleData(schedule);
+          
+          await updateDoc(doc(db, 'municipalities', selectedMunicipalityId, 'areas', areaDoc.id), {
+            schedule: normalizedSchedule
+          });
+          
+          normalizedCount++;
+          setNormalizeStatus(
+            `正規化中: ${areaData.name} (${normalizedCount + skippedCount}/${areasSnapshot.docs.length})`
+          );
+        } else {
+          skippedCount++;
+        }
+      }
+
+      setNormalizeStatus(
+        `✓ 正規化完了: ${municipality.prefecture} - ` +
+        `${normalizedCount}件を正規化、${skippedCount}件はスキップしました`
+      );
+    } catch (err) {
+      console.error('Normalization error:', err);
+      setError('正規化に失敗しました: ' + (err as Error).message);
+    } finally {
+      setNormalizeLoading(false);
     }
   };
 
@@ -180,16 +279,63 @@ export default function DataMigrationPage() {
         {municipalities.length === 0 ? (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
             <p className="text-yellow-800">
-              先に市町村を登録してください。
+              先に都道府県を登録してください。
             </p>
           </div>
         ) : (
           <>
+            {/* データ正規化セクション */}
+            <div className="bg-white p-6 rounded-lg shadow mb-6">
+              <h2 className="text-2xl font-semibold mb-4">既存データの正規化</h2>
+              <p className="text-gray-600 mb-4">
+                Firestoreに保存されている既存のスケジュールデータを正しい形式に変換します。<br />
+                （"2025-04" 形式を "4" 形式に変換）
+              </p>
+              
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2 font-medium">対象の都道府県</label>
+                <select
+                  value={selectedMunicipalityId}
+                  onChange={(e) => setSelectedMunicipalityId(e.target.value)}
+                  className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={normalizeLoading || loading}
+                >
+                  {municipalities.map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.prefecture}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                onClick={handleNormalizeAllData}
+                disabled={normalizeLoading || loading}
+                className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center"
+              >
+                {normalizeLoading ? (
+                  <>処理中...</>
+                ) : (
+                  <>
+                    <RefreshCw className="w-5 h-5 mr-2" />
+                    データを正規化
+                  </>
+                )}
+              </button>
+
+              {normalizeStatus && (
+                <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg flex items-start">
+                  <CheckCircle className="w-5 h-5 text-purple-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <p className="text-purple-800">{normalizeStatus}</p>
+                </div>
+              )}
+            </div>
+
             <div className="bg-white p-6 rounded-lg shadow mb-6">
               <h2 className="text-2xl font-semibold mb-4">ステップ1: JSONファイルを選択</h2>
               
               <div className="mb-4">
-                <label className="block text-gray-700 mb-2 font-medium">インポート先の市町村</label>
+                <label className="block text-gray-700 mb-2 font-medium">インポート先の都道府県</label>
                 <select
                   value={selectedMunicipalityId}
                   onChange={(e) => setSelectedMunicipalityId(e.target.value)}
@@ -198,7 +344,7 @@ export default function DataMigrationPage() {
                 >
                   {municipalities.map(m => (
                     <option key={m.id} value={m.id}>
-                      {m.prefecture} {m.name}
+                      {m.prefecture}
                     </option>
                   ))}
                 </select>

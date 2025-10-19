@@ -20,7 +20,6 @@ interface Area {
 
 interface Municipality {
   id: string;
-  name: string;
   prefecture: string;
 }
 
@@ -99,13 +98,13 @@ export default function AreasPage() {
             schedule: scheduleData
           }
         );
-        alert('地域を更新しました');
+        alert('エリアを更新しました');
       } else {
         await addDoc(collection(db, 'municipalities', municipalityId, 'areas'), {
           name: formData.name,
           schedule: scheduleData
         });
-        alert('地域を追加しました');
+        alert('エリアを追加しました');
       }
 
       setFormData({
@@ -120,7 +119,7 @@ export default function AreasPage() {
       fetchData();
     } catch (error) {
       console.error('Error saving area:', error);
-      alert('地域の保存に失敗しました');
+      alert('エリアの保存に失敗しました');
     }
   };
 
@@ -141,10 +140,10 @@ export default function AreasPage() {
     try {
       await deleteDoc(doc(db, 'municipalities', municipalityId, 'areas', areaId));
       fetchData();
-      alert('地域を削除しました');
+      alert('エリアを削除しました');
     } catch (error) {
       console.error('Error deleting area:', error);
-      alert('地域の削除に失敗しました');
+      alert('エリアの削除に失敗しました');
     }
   };
 
@@ -187,14 +186,14 @@ export default function AreasPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <Link href="/municipalities" className="text-blue-600 hover:underline mb-4 inline-block">
-            ← 市町村一覧に戻る
+            ← 都道府県一覧に戻る
           </Link>
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900">地域管理</h1>
+              <h1 className="text-4xl font-bold text-gray-900">エリア管理</h1>
               {municipality && (
                 <p className="text-xl text-gray-600 mt-2">
-                  {municipality.prefecture} {municipality.name}
+                  {municipality.prefecture}
                 </p>
               )}
             </div>
@@ -221,17 +220,17 @@ export default function AreasPage() {
         {showForm && (
           <div className="bg-white p-6 rounded-lg shadow mb-6">
             <h2 className="text-2xl font-semibold mb-4">
-              {editingArea ? '地域を編集' : '地域を追加'}
+              {editingArea ? 'エリアを編集' : 'エリアを追加'}
             </h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-6">
-                <label className="block text-gray-700 mb-2 font-medium">地域名</label>
+                <label className="block text-gray-700 mb-2 font-medium">エリア名</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="例: 渋谷1丁目"
+                  placeholder="例: 渋谷区"
                   required
                 />
               </div>
@@ -287,7 +286,7 @@ export default function AreasPage() {
         <div className="bg-white rounded-lg shadow">
           {areas.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
-              地域が登録されていません
+              エリアが登録されていません
             </div>
           ) : (
             <div className="divide-y divide-gray-200">

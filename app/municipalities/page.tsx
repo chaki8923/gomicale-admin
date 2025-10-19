@@ -8,7 +8,6 @@ import { Plus, Trash2, Settings } from 'lucide-react';
 
 interface Municipality {
   id: string;
-  name: string;
   prefecture: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -18,7 +17,7 @@ export default function MunicipalitiesPage() {
   const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ name: '', prefecture: '' });
+  const [formData, setFormData] = useState({ prefecture: '' });
 
   useEffect(() => {
     fetchMunicipalities();
@@ -44,30 +43,29 @@ export default function MunicipalitiesPage() {
     e.preventDefault();
     try {
       await addDoc(collection(db, 'municipalities'), {
-        name: formData.name,
         prefecture: formData.prefecture,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       });
-      setFormData({ name: '', prefecture: '' });
+      setFormData({ prefecture: '' });
       setShowForm(false);
       fetchMunicipalities();
-      alert('市町村を追加しました');
+      alert('都道府県を追加しました');
     } catch (error) {
       console.error('Error adding municipality:', error);
-      alert('市町村の追加に失敗しました');
+      alert('都道府県の追加に失敗しました');
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`${name}を削除しますか？`)) return;
+  const handleDelete = async (id: string, prefecture: string) => {
+    if (!confirm(`${prefecture}を削除しますか？`)) return;
     try {
       await deleteDoc(doc(db, 'municipalities', id));
       fetchMunicipalities();
-      alert('市町村を削除しました');
+      alert('都道府県を削除しました');
     } catch (error) {
       console.error('Error deleting municipality:', error);
-      alert('市町村の削除に失敗しました');
+      alert('都道府県の削除に失敗しました');
     }
   };
 
@@ -87,7 +85,7 @@ export default function MunicipalitiesPage() {
             ← ダッシュボードに戻る
           </Link>
           <div className="flex justify-between items-center">
-            <h1 className="text-4xl font-bold text-gray-900">市町村管理</h1>
+            <h1 className="text-4xl font-bold text-gray-900">都道府県管理</h1>
             <button
               onClick={() => setShowForm(!showForm)}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center hover:bg-blue-700"
@@ -100,27 +98,16 @@ export default function MunicipalitiesPage() {
 
         {showForm && (
           <div className="bg-white p-6 rounded-lg shadow mb-6">
-            <h2 className="text-2xl font-semibold mb-4">市町村を追加</h2>
+            <h2 className="text-2xl font-semibold mb-4">都道府県を追加</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label className="block text-gray-700 mb-2">都道府県</label>
+                <label className="block text-gray-700 mb-2">都道府県名</label>
                 <input
                   type="text"
                   value={formData.prefecture}
-                  onChange={(e) => setFormData({ ...formData, prefecture: e.target.value })}
+                  onChange={(e) => setFormData({ prefecture: e.target.value })}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="例: 東京都"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">市町村名</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="例: 渋谷区"
                   required
                 />
               </div>
@@ -146,7 +133,7 @@ export default function MunicipalitiesPage() {
         <div className="bg-white rounded-lg shadow">
           {municipalities.length === 0 ? (
             <div className="p-8 text-center text-gray-500">
-              市町村が登録されていません
+              都道府県が登録されていません
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -154,10 +141,7 @@ export default function MunicipalitiesPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      都道府県
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      市町村名
+                      都道府県名
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       操作
@@ -170,19 +154,16 @@ export default function MunicipalitiesPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {municipality.prefecture}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {municipality.name}
-                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link
                           href={`/municipalities/${municipality.id}/areas`}
                           className="text-blue-600 hover:text-blue-900 mr-4 inline-flex items-center"
                         >
                           <Settings className="w-4 h-4 mr-1" />
-                          地域管理
+                          エリア管理
                         </Link>
                         <button
-                          onClick={() => handleDelete(municipality.id, municipality.name)}
+                          onClick={() => handleDelete(municipality.id, municipality.prefecture)}
                           className="text-red-600 hover:text-red-900 inline-flex items-center"
                         >
                           <Trash2 className="w-4 h-4 mr-1" />
