@@ -21,14 +21,21 @@ interface JsonMonthlySchedule {
 
 interface JsonArea {
   name: string;
+  name_en?: string; // 英語名（オプション）
   monthlySchedules: JsonMonthlySchedule[];
 }
 
 interface JsonGarbageItem {
   name: string;
+  name_ja?: string; // 日本語名（オプション）
+  name_en?: string; // 英語名（オプション）
   category: string;
   description: string;
+  description_ja?: string; // 日本語説明（オプション）
+  description_en?: string; // 英語説明（オプション）
   examples: string[];
+  examples_ja?: string[]; // 日本語例（オプション）
+  examples_en?: string[]; // 英語例（オプション）
 }
 
 interface JsonData {
@@ -124,34 +131,81 @@ export default function DataMigrationPage() {
 
       let areaCount = 0;
       let itemCount = 0;
+      const areaIds: string[] = [];
 
       // 地域データをインポート
       setStatus('地域データをインポート中...');
       for (const jsonArea of jsonData.areas) {
         const schedule = convertToGarbageSchedule(jsonArea);
         
-        await addDoc(collection(db, 'municipalities', selectedMunicipalityId, 'areas'), {
+        const areaData: any = {
           name: jsonArea.name,
           schedule: schedule
-        });
+        };
+        
+        // 英語名があれば追加
+        if (jsonArea.name_en) {
+          areaData.name_en = jsonArea.name_en;
+        }
+        
+        const areaRef = await addDoc(collection(db, 'municipalities', selectedMunicipalityId, 'areas'), areaData);
+        areaIds.push(areaRef.id);
         
         areaCount++;
         setStatus(`地域データをインポート中... (${areaCount}/${jsonData.areas.length})`);
       }
 
-      // ごみ分別品目をインポート
-      setStatus('ごみ分別品目をインポート中...');
-      for (const item of jsonData.garbageItems) {
-        await addDoc(collection(db, 'garbageItems'), {
-          municipalityId: selectedMunicipalityId,
-          name: item.name,
-          category: item.category as GarbageCategory,
-          description: item.description,
-          examples: item.examples
-        });
-        
-        itemCount++;
-        setStatus(`ごみ分別品目をインポート中... (${itemCount}/${jsonData.garbageItems.length})`);
+      // ごみ分別品目を各エリアのサブコレクションとしてインポート
+      if (jsonData.garbageItems && jsonData.garbageItems.length > 0) {
+        setStatus('ごみ分別品目をインポート中...');
+        for (const areaId of areaIds) {
+          for (const item of jsonData.garbageItems) {
+            const itemData: any = {
+              category: item.category as GarbageCategory,
+            };
+            
+            // 名前フィールドの処理
+            if (item.name_ja) {
+              itemData.name_ja = item.name_ja;
+            } else if (item.name) {
+              itemData.name_ja = item.name; // nameがあればname_jaとして保存
+            }
+            
+            if (item.name_en) {
+              itemData.name_en = item.name_en;
+            }
+            
+            // 説明フィールドの処理
+            if (item.description_ja) {
+              itemData.description_ja = item.description_ja;
+            } else if (item.description) {
+              itemData.description_ja = item.description; // descriptionがあればdescription_jaとして保存
+            }
+            
+            if (item.description_en) {
+              itemData.description_en = item.description_en;
+            }
+            
+            // 例フィールドの処理
+            if (item.examples_ja) {
+              itemData.examples_ja = item.examples_ja;
+            } else if (item.examples) {
+              itemData.examples_ja = item.examples; // examplesがあればexamples_jaとして保存
+            }
+            
+            if (item.examples_en) {
+              itemData.examples_en = item.examples_en;
+            }
+            
+            await addDoc(
+              collection(db, 'municipalities', selectedMunicipalityId, 'areas', areaId, 'garbageItems'), 
+              itemData
+            );
+            
+            itemCount++;
+          }
+          setStatus(`ごみ分別品目をインポート中... (${itemCount}/${jsonData.garbageItems.length * areaIds.length})`);
+        }
       }
 
       setStatus(`✓ インポート完了: ${municipality.prefecture} - 地域${areaCount}件、品目${itemCount}件を登録しました`);
@@ -391,7 +445,9 @@ export default function DataMigrationPage() {
                     <ul className="list-disc list-inside text-gray-700 space-y-1">
                       {jsonData.areas.map((area, idx) => (
                         <li key={idx}>
-                          {area.name} ({area.monthlySchedules.length}ヶ月分のスケジュール)
+                          {area.name}
+                          {area.name_en && <span className="text-gray-500 ml-2">({area.name_en})</span>}
+                          {' '}({area.monthlySchedules.length}ヶ月分のスケジュール)
                         </li>
                       ))}
                     </ul>
@@ -402,7 +458,10 @@ export default function DataMigrationPage() {
                     <ul className="list-disc list-inside text-gray-700 space-y-1">
                       {jsonData.garbageItems.map((item, idx) => (
                         <li key={idx}>
-                          {item.name} ({item.category})
+                          {item.name_ja || item.name}
+                          {item.name_en && <span className="text-gray-500 ml-2">({item.name_en})</span>}
+                          {' '}
+                          <span className="text-blue-600">({item.category})</span>
                         </li>
                       ))}
                     </ul>

@@ -5,11 +5,14 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
-    "start": "next start"
+    "start": "next start",
+    "seed:prefectures": "node scripts/seed-prefectures.js",
+    "seed:prefectures:clear": "node scripts/seed-prefectures.js --clear"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "firebase": "^12.4.0",
+    "firebase-admin": "^12.7.0",
     "lucide-react": "^0.545.0",
     "next": "15.5.4",
     "react": "19.1.0",

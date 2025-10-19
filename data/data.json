@@ -1,138 +1,103 @@
 {
   "areas": [
     {
-      "name": "上広瀬、広瀬台、下広瀬、広瀬、広瀬東、つつじ野、根岸、笹井地区",
+      "name": "新宿区",
+      "name_en": "Shinjuku-ku",
       "monthlySchedules": [
         {
           "month": "2025-04",
           "schedule": {
             "burnable": [1, 4, 8, 11, 15, 18, 22, 25, 29],
-            "nonBurnable": [23],
-            "plastics": [3, 10, 17, 24],
-            "pet_bottles": [9],
-            "bottles_and_cans": [7, 21],
-            "paper_and_cloth": [14, 28]
+            "resources": [2, 9, 16, 23, 30],
+            "metal_pottery_glass": [5, 19]
           }
         },
         {
           "month": "2025-05",
           "schedule": {
             "burnable": [2, 6, 9, 13, 16, 20, 23, 27, 30],
-            "nonBurnable": [28],
-            "plastics": [1, 8, 15, 22, 29],
-            "pet_bottles": [14],
-            "bottles_and_cans": [5, 19],
-            "paper_and_cloth": [12, 26]
+            "resources": [7, 14, 21, 28],
+            "metal_pottery_glass": [3, 17]
           }
         },
         {
           "month": "2025-06",
           "schedule": {
             "burnable": [3, 6, 10, 13, 17, 20, 24, 27],
-            "nonBurnable": [25],
-            "plastics": [5, 12, 19, 26],
-            "pet_bottles": [11],
-            "bottles_and_cans": [2, 16],
-            "paper_and_cloth": [9, 23]
+            "resources": [4, 11, 18, 25],
+            "metal_pottery_glass": [7, 21]
           }
         },
         {
           "month": "2025-07",
           "schedule": {
             "burnable": [1, 4, 8, 11, 15, 18, 22, 25, 29],
-            "nonBurnable": [23],
-            "plastics": [3, 10, 17, 24, 31],
-            "pet_bottles": [9],
-            "bottles_and_cans": [7, 21],
-            "paper_and_cloth": [14, 28]
+            "resources": [2, 9, 16, 23, 30],
+            "metal_pottery_glass": [5, 19]
           }
         },
         {
           "month": "2025-08",
           "schedule": {
             "burnable": [1, 5, 8, 12, 15, 19, 22, 26, 29],
-            "nonBurnable": [27],
-            "plastics": [7, 14, 21, 28],
-            "pet_bottles": [13],
-            "bottles_and_cans": [4, 18],
-            "paper_and_cloth": [11, 25]
+            "resources": [6, 13, 20, 27],
+            "metal_pottery_glass": [2, 16]
           }
         },
         {
           "month": "2025-09",
           "schedule": {
             "burnable": [2, 5, 9, 12, 16, 19, 23, 26, 30],
-            "nonBurnable": [24],
-            "plastics": [4, 11, 18, 25],
-            "pet_bottles": [10],
-            "bottles_and_cans": [1, 15],
-            "paper_and_cloth": [8, 22]
+            "resources": [3, 10, 17, 24],
+            "metal_pottery_glass": [6, 20]
           }
         },
         {
           "month": "2025-10",
           "schedule": {
             "burnable": [3, 7, 10, 14, 17, 21, 24, 28, 31],
-            "nonBurnable": [22],
-            "plastics": [2, 9, 16, 23, 30],
-            "pet_bottles": [8],
-            "bottles_and_cans": [6, 20],
-            "paper_and_cloth": [13, 27]
+            "resources": [1, 8, 15, 22, 29],
+            "metal_pottery_glass": [4, 18]
           }
         },
         {
           "month": "2025-11",
           "schedule": {
             "burnable": [4, 7, 11, 14, 18, 21, 25, 28],
-            "nonBurnable": [26],
-            "plastics": [6, 13, 20, 27],
-            "pet_bottles": [12],
-            "bottles_and_cans": [3, 17],
-            "paper_and_cloth": [10, 24]
+            "resources": [5, 12, 19, 26],
+            "metal_pottery_glass": [1, 15]
           }
         },
         {
           "month": "2025-12",
           "schedule": {
-            "burnable": [1, 5, 9, 12, 16, 19, 23, 26, 30],
-            "nonBurnable": [10, 24],
-            "plastics": [4, 11, 18, 25],
-            "pet_bottles": [9],
-            "bottles_and_cans": [2, 15],
-            "paper_and_cloth": [8, 22]
+            "burnable": [2, 5, 9, 12, 16, 19, 23, 26, 30],
+            "resources": [3, 10, 17, 24, 31],
+            "metal_pottery_glass": [6, 20]
           }
         },
         {
           "month": "2026-01",
           "schedule": {
-            "burnable": [6, 9, 13, 16, 20, 23, 27, 30],
-            "nonBurnable": [28],
-            "plastics": [8, 15, 22, 29],
-            "pet_bottles": [14],
-            "bottles_and_cans": [5, 19],
-            "paper_and_cloth": [12, 26]
+            "burnable": [2, 6, 9, 13, 16, 20, 23, 27, 30],
+            "resources": [7, 14, 21, 28],
+            "metal_pottery_glass": [3, 17]
           }
         },
         {
           "month": "2026-02",
           "schedule": {
             "burnable": [3, 6, 10, 13, 17, 20, 24, 27],
-            "nonBurnable": [25],
-            "plastics": [5, 12, 19, 26],
-            "pet_bottles": [11],
-            "bottles_and_cans": [2, 16],
-            "paper_and_cloth": [9, 23]
+            "resources": [4, 11, 18, 25],
+            "metal_pottery_glass": [7, 21]
           }
         },
         {
           "month": "2026-03",
           "schedule": {
             "burnable": [3, 6, 10, 13, 17, 20, 24, 27, 31],
-            "nonBurnable": [25],
-            "plastics": [5, 12, 19, 26],
-            "pet_bottles": [11],
-            "bottles_and_cans": [2, 16],
-            "paper_and_cloth": [9, 23]
+            "resources": [4, 11, 18, 25],
+            "metal_pottery_glass": [7, 21]
           }
         }
       ]
@@ -140,68 +105,22 @@
   ],
   "garbageItems": [
     {
-      "name": "もやすごみ",
+      "name": "資源",
+      "category": "resources",
+      "description": "週1回 (水曜日)",
+      "examples": []
+    },
+    {
+      "name": "燃やすこみ",
       "category": "burnable",
-      "description": "収集日当日の朝8時までに出してください 。生ごみは水分を切ってください。食用油は紙・布に浸み込ませて出してください。",
-      "examples": [
-        "生ごみ",
-        "食用油",
-        "紙おむつ"
-      ]
+      "description": "週2回 (火曜日・金曜日)",
+      "examples": []
     },
     {
-      "name": "もやさないごみ",
-      "category": "nonBurnable",
-      "description": "ライターは別袋で出してください。蛍光管・LED管は別置きしてください 。",
-      "examples": [
-        "金属・ガラス・せともの類",
-        "アルミホイル・調理器具",
-        "ライター",
-        "蛍光管・LED管"
-      ]
-    },
-    {
-      "name": "プラスチック",
-      "category": "plastics",
-      "description": "PETマークのあるもの（ペットボトル）は除きます。",
-      "examples": [
-        "ポリ袋・トレイ",
-        "カップ・ボトル",
-        "プラスチック製品",
-        "発泡スチロール"
-      ]
-    },
-    {
-      "name": "ペットボトル",
-      "category": "pet_bottles",
-      "description": "PETマークのあるものに限ります。",
-      "examples": [
-        "飲料用・酒類用",
-        "醤油・みりん用"
-      ]
-    },
-    {
-      "name": "びん・缶・小型電化製品",
-      "category": "bottles_and_cans",
-      "description": "スプレー缶、乾電池、小型電化製品は、それぞれ別袋で出してください 。",
-      "examples": [
-        "飲料用・食品用等のびん・缶",
-        "スプレー缶",
-        "乾電池",
-        "小型電化製品"
-      ]
-    },
-    {
-      "name": "古紙・古布",
-      "category": "paper_and_cloth",
-      "description": "古紙と古布は同じ日に収集されます。",
-      "examples": [
-        "新聞紙",
-        "ダンボール",
-        "雑誌・雑がみ",
-        "紙パック",
-        "古布（古着・毛布等）"
-      ]
+      "name": "金属・陶器・ガラスごみ",
+      "category": "metal_pottery_glass",
+      "description": "月2回 (第1・第3土曜日)",
+      "examples": []
     }
   ]
 }
