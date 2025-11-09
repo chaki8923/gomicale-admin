@@ -10,7 +10,25 @@ service cloud.firestore {
       // TODO: 本番環境では認証を実装してください
       allow write: if true;
       
-      // 地域サブコレクション
+      // 市区町村サブコレクション（新階層構造）
+      match /cities/{city} {
+        allow read: if true;
+        allow write: if true;
+        
+        // 地域サブコレクション（新階層構造）
+        match /areas/{area} {
+          allow read: if true;
+          allow write: if true;
+          
+          // エリアごとのごみ分別品目サブコレクション
+          match /garbageItems/{item} {
+            allow read: if true;
+            allow write: if true;
+          }
+        }
+      }
+      
+      // 地域サブコレクション（旧階層構造 - 後方互換性のため残す）
       match /areas/{area} {
         allow read: if true;
         allow write: if true;
